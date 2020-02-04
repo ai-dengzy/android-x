@@ -363,7 +363,8 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 {
                     val selectContent=it.data.getString("selectContent")
                     if(selectContent.equals("自定义") || selectContent.equals("其他") ||selectContent.equals("填写")){
-                        etDialogSelectItem.isEnabled=true
+                        etDialogSelectItem.isCursorVisible = true
+                        etDialogSelectItem.isFocusable = true
                         etDialogSelectItem.hint="请输入"
                         etDialogSelectItem.setText("")
                         etDialogSelectItem.addTextChangedListener(object :TextWatcher{
@@ -380,7 +381,9 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                             }
                         })
                     }else{
-                        etDialogSelectItem.isEnabled=false
+//                        etDialogSelectItem.isEnabled=false
+                        etDialogSelectItem.isCursorVisible = false
+                        etDialogSelectItem.isFocusable = false
                         etDialogSelectItem.setText(selectContent)
                         mData[itemPosition].selectContent=selectContent!!
                     }
@@ -407,14 +410,10 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 MESSAGE_SELECT_OK->
                 {
                     val selectContent=it.data.getString("selectContent")
-                    if(selectContent.equals("自定义") || selectContent.equals("其他") ||selectContent.equals("填写")){
-                        tvTextFirstDialog.isEnabled=true
-                        tvTextFirstDialog.hint="请输入"
-                        tvTextFirstDialog.text=""
-                    }else{
-                        tvTextFirstDialog.isEnabled=true
+                        tvTextFirstDialog.isCursorVisible = false
+                        tvTextFirstDialog.isFocusable = false
                         tvTextFirstDialog.text=selectContent
-                    }
+
                     false
                 }
                 else->
@@ -429,14 +428,9 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 MESSAGE_SELECT_OK->
                 {
                     val selectContent=it.data.getString("selectContent")
-                    if(selectContent.equals("自定义") || selectContent.equals("其他") ||selectContent.equals("填写")){
-                        tvTextSecondDialog.isEnabled=true
-                        tvTextSecondDialog.hint="请输入"
-                        tvTextSecondDialog.text=""
-                    }else{
-                        tvTextSecondDialog.isEnabled=true
+
                         tvTextSecondDialog.text=selectContent
-                    }
+
 
                     false
                 }
@@ -1182,7 +1176,7 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                     tvNecessary.setTextSize(TypedValue.COMPLEX_UNIT_PX,context.resources.getDimensionPixelSize(R.dimen.font_tv_hint_15).toFloat())
                     tvNecessary.setTextColor(ContextCompat.getColor(context,R.color.red))
                     (vh.itemView as ViewGroup).addView(tvNecessary,0)
-                   } else{
+                   }else{
                      val tvNecessary=TextView(context)
                      tvNecessary.text="  "
                      tvNecessary.gravity=Gravity.START
@@ -1345,10 +1339,14 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 if (mData[position].inputRangeValue1!="")
                 {
                     vh.etRangeValue1.setText(mData[position].inputRangeValue1)
+                }else{
+                    vh.etRangeValue1.setText("16")
                 }
                 if (mData[position].inputRangeValue2!="")
                 {
                     vh.etRangeValue2.setText(mData[position].inputRangeValue2)
+                }else{
+                    vh.etRangeValue2.setText("60")
                 }
 
             }

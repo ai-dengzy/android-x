@@ -17,6 +17,7 @@ import com.example.eletronicengineer.adapter.RecyclerviewAdapter
 import com.example.eletronicengineer.adapter.RecyclerviewAdapter.Companion.MESSAGE_SELECT_OK
 import com.example.eletronicengineer.custom.CustomDialog
 import com.example.eletronicengineer.model.Constants
+import com.example.eletronicengineer.utils.AdapterGenerate
 import com.example.eletronicengineer.utils.FragmentHelper
 import com.example.eletronicengineer.utils.UnSerializeDataBase
 import com.example.eletronicengineer.utils.startSendMessage
@@ -188,6 +189,7 @@ class MyRegistrationFragment :Fragment(){
                                 val bundle = Bundle()
                                 bundle.putString("demandIndividual",js.toString())
                                 bundle.putInt("type",Constants.FragmentType.DEMAND_INDIVIDUAL_TYPE.ordinal)
+                                bundle.putInt("selectType",Constants.FragmentType.PERSONAL_TYPE.ordinal)
                                 FragmentHelper.switchFragment(activity!!,MyRegistrationMoreFragment.newInstance(bundle),R.id.frame_my_registration,"")
                             }
                             data.add(item)
@@ -225,11 +227,13 @@ class MyRegistrationFragment :Fragment(){
                         val data = adapter.mData.toMutableList()
                         for (j in 0 until jsonArray.length()){
                             val js = jsonArray.getJSONObject(j)
-                            val item = MultiStyleItem(MultiStyleItem.Options.DEMAND_ITEM,"需求团队",js.getJSONObject("requirementTeamLoggingCheck").getString("type"),"")
+                            val type = js.getJSONObject("requirementTeamLoggingCheck").getString("type")
+                            val item = MultiStyleItem(MultiStyleItem.Options.DEMAND_ITEM,"需求团队",type,"")
                             item.jumpListener=View.OnClickListener {
                                 val bundle = Bundle()
                                 bundle.putString("demandGroup",js.toString())
                                 bundle.putInt("type",Constants.FragmentType.DEMAND_GROUP_TYPE.ordinal)
+                                bundle.putInt("selectType",AdapterGenerate().getType("需求团队 ${type}"))
                                 FragmentHelper.switchFragment(activity!!,MyRegistrationMoreFragment.newInstance(bundle),R.id.frame_my_registration,"")
                             }
                             data.add(item)
@@ -269,11 +273,13 @@ class MyRegistrationFragment :Fragment(){
                         val data = adapter.mData.toMutableList()
                         for (j in 0 until jsonArray.length()){
                             val js = jsonArray.getJSONObject(j)
-                            val item = MultiStyleItem(MultiStyleItem.Options.DEMAND_ITEM,"需求租赁",js.getJSONObject("leaseLoggingCheck").getString("type"),"")
+                            val type = js.getJSONObject("leaseLoggingCheck").getString("type")
+                            val item = MultiStyleItem(MultiStyleItem.Options.DEMAND_ITEM,"需求租赁",type,"")
                             item.jumpListener=View.OnClickListener {
                                 val bundle = Bundle()
                                 bundle.putString("demandLease",js.toString())
                                 bundle.putInt("type",Constants.FragmentType.DEMAND_LEASE_TYPE.ordinal)
+                                bundle.putInt("selectType",AdapterGenerate().getType("需求租赁 ${type}"))
                                 FragmentHelper.switchFragment(activity!!,MyRegistrationMoreFragment.newInstance(bundle),R.id.frame_my_registration,"")
                             }
                             data.add(item)
@@ -318,6 +324,7 @@ class MyRegistrationFragment :Fragment(){
                                 val bundle = Bundle()
                                 bundle.putString("demandTripartite",js.toString())
                                 bundle.putInt("type",Constants.FragmentType.DEMAND_TRIPARTITE_TYPE.ordinal)
+                                bundle.putInt("selectType",Constants.FragmentType.TRIPARTITE_TYPE.ordinal)
                                 FragmentHelper.switchFragment(activity!!,MyRegistrationMoreFragment.newInstance(bundle),R.id.frame_my_registration,"")
                             }
                             data.add(item)

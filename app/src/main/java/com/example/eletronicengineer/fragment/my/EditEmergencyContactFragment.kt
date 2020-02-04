@@ -126,10 +126,15 @@ class EditEmergencyContactFragment :Fragment(){
     private fun initFragment() {
         val mMultiStyleItemList:MutableList<MultiStyleItem> = ArrayList()
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"姓名"))
+        mMultiStyleItemList[mMultiStyleItemList.size-1].necessary = true
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"关系"))
+        mMultiStyleItemList[mMultiStyleItemList.size-1].necessary = true
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"电话"))
+        mMultiStyleItemList[mMultiStyleItemList.size-1].necessary = true
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"身份证号码"))
+        mMultiStyleItemList[mMultiStyleItemList.size-1].necessary = true
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"地址"))
+        mMultiStyleItemList[mMultiStyleItemList.size-1].necessary = true
         mMultiStyleItemList.add(MultiStyleItem(MultiStyleItem.Options.INPUT_WITH_TEXTAREA,"备注","",true))
         if(style==1){
             json = JSONObject(arguments!!.getString("urgentPeople"))

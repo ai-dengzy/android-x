@@ -1,11 +1,13 @@
 package com.example.eletronicengineer.fragment.my
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.eletronicengineer.R
+import com.example.eletronicengineer.adapter.RecyclerviewAdapter
 import com.example.eletronicengineer.custom.LoadingDialog
 import com.example.eletronicengineer.model.Constants
 import com.example.eletronicengineer.utils.*
@@ -25,9 +27,11 @@ import java.util.concurrent.TimeUnit
 class BindEmailInformationFragment :Fragment(){
     lateinit var title:String
     private var mDisposable: Disposable? = null
+    lateinit var mHandler: Handler
     companion object{
-        fun newInstance(args:Bundle):BindEmailInformationFragment{
+        fun newInstance(args:Bundle,mHandler: Handler):BindEmailInformationFragment{
             val bindEmailInformationFragment = BindEmailInformationFragment()
+            bindEmailInformationFragment.mHandler = mHandler
             bindEmailInformationFragment.arguments = args
             return bindEmailInformationFragment
         }
@@ -98,8 +102,11 @@ class BindEmailInformationFragment :Fragment(){
                             val json = JSONObject(it.string())
                             val message = json.getString("message")
                             if(json.getInt("code")==200){
-                                val fragment = activity!!.supportFragmentManager.findFragmentByTag("bindEmail") as BindEmailFragment
-                                fragment.update(email)
+                                val msg = mHandler.obtainMessage(RecyclerviewAdapter.MESSAGE_SELECT_OK)
+                                val data= Bundle()
+                                data.putString("email",email)
+                                msg.data=data
+                                mHandler.sendMessage(msg)
                                 activity!!.supportFragmentManager.popBackStackImmediate()
                             }
                             ToastHelper.mToast(view.context, message)

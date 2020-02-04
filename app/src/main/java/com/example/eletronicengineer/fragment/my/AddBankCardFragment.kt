@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.eletronicengineer.R
 import com.example.eletronicengineer.model.Constants
+import com.example.eletronicengineer.utils.ToastHelper
 import com.example.eletronicengineer.utils.UnSerializeDataBase
 import com.example.eletronicengineer.utils.startSendMessage
 import io.card.payment.CardIOActivity
@@ -42,31 +43,45 @@ class AddBankCardFragment :Fragment(){
             activity!!.supportFragmentManager.popBackStackImmediate()
         }
         mView.btn_add_bank_card.setOnClickListener {
-            val result = Observable.create<RequestBody>{
-                val jsonObject = JSONObject().put("bankCardNumber",editTextContent.replace(" ",""))
-                    .put("bankType",mView.et_bank_name.text.toString())
+            val bankCardNumber = editTextContent.replace(" ","")
+            val bankType = mView.et_bank_name.text.toString()
+            if(bankCardNumber.length<16){
+                ToastHelper.mToast(mView.context,"请输入16-19位的银行卡号")
+            } else if(bankType==""){
+                ToastHelper.mToast(mView.context,"请输入开户银行名称")
+            }else {
+                val result = Observable.create<RequestBody> {
+                    val jsonObject = JSONObject().put("bankCardNumber", bankCardNumber)
+                        .put("bankType", bankType)
 //                    .put("bankType",mView.sp_bank.selectedItem.toString())
-                val requestBody = RequestBody.create(MediaType.parse("application/json"),jsonObject.toString())
-                it.onNext(requestBody)
-            }.subscribe {
-                val result = startSendMessage(it,
-                    UnSerializeDataBase.mineBasePath+Constants.HttpUrlPath.My.insertBankCard).subscribeOn(
-                    Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        if(JSONObject(it.string()).getInt("code")==200){
-                            val toast = Toast.makeText(context,"添加成功",Toast.LENGTH_SHORT)
-                            toast.setGravity(Gravity.CENTER,0,0)
-                            toast.show()
-                            mView.tv_add_bank_card_back.callOnClick()
-                        }else{
-                            val toast = Toast.makeText(context,"添加失败",Toast.LENGTH_SHORT)
-                            toast.setGravity(Gravity.CENTER,0,0)
-                            toast.show()
-                        }
-                    },{
-                        it.printStackTrace()
-                    })
+                    val requestBody = RequestBody.create(
+                        MediaType.parse("application/json"),
+                        jsonObject.toString()
+                    )
+                    it.onNext(requestBody)
+                }.subscribe {
+                    val result = startSendMessage(
+                        it,
+                        UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.insertBankCard
+                    ).subscribeOn(
+                        Schedulers.io()
+                    )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            if (JSONObject(it.string()).getInt("code") == 200) {
+                                val toast = Toast.makeText(context, "添加成功", Toast.LENGTH_SHORT)
+                                toast.setGravity(Gravity.CENTER, 0, 0)
+                                toast.show()
+                                mView.tv_add_bank_card_back.callOnClick()
+                            } else {
+                                val toast = Toast.makeText(context, "添加失败", Toast.LENGTH_SHORT)
+                                toast.setGravity(Gravity.CENTER, 0, 0)
+                                toast.show()
+                            }
+                        }, {
+                            it.printStackTrace()
+                        })
+                }
             }
         }
         mView.et_bank_card_account.addTextChangedListener(object :TextWatcher{

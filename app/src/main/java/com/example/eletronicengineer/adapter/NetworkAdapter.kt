@@ -5823,6 +5823,9 @@ class NetworkAdapter {
                             "公司名称","注册地址","经营范围"->{
                                 if (j.inputSingleContent == "") { result = "${j.inputSingleTitle.replace("：", "")}不能为空" }
                             }
+                            else->{
+                                if (j.inputSingleContent == "") { result = "${j.inputSingleTitle.replace("：", "")}不能为空" }
+                        }
                         }
                     }else {
                         when (j.inputSingleTitle) {
@@ -5878,19 +5881,26 @@ class NetworkAdapter {
                     }
                 }
                 MultiStyleItem.Options.SINGLE_DISPLAY_RIGHT->{
-                    if(j.necessary==true) {//为true此项为必填需检验
+                    if(j.necessary) {//为true此项为必填需检验
                         when (j.singleDisplayRightTitle) {
                             "需要人数(人)" -> {
                                 if (j.singleDisplayRightContent.toInt() == 0) {
                                     result = "请至少填写一条成员清册数据"
                                 }
                             }
-                        }
-                    }else{
-                        if(j.singleDisplayRightTitle.contains("清册")&&!j.necessary&&j.singleDisplayRightTitle!="车辆清册"){
-                            result = "${j.singleDisplayRightTitle.replace("：", "")}没有填写"
+                            else -> {
+                                if(j.singleDisplayRightTitle.contains("成员清册") && mData[1].singleDisplayRightContent in listOf("普工","负责人","工程师","设计员","特种作业","专业操作","勘测员","驾驶员","九大员","注册类","其他")){
+                                    if(j.submitNecessarySize==0)
+                                    result = "${j.singleDisplayRightTitle.replace("：", "")}至少填写一个"
+                                }
+                                else if (j.singleDisplayRightTitle.contains("清册") && !j.submitIsNecessary) {
+                                    result = "${j.singleDisplayRightTitle.replace("：", "")}没有填写完整"
 
-                        } else { result = "" }
+                                } else {
+                                    result = ""
+                                }
+                            }
+                        }
                     }
 
                     if (result != "") {
@@ -5985,8 +5995,7 @@ class NetworkAdapter {
                         return false
                     }
                 }
-                MultiStyleItem.Options.MULTI_BUTTON->
-                {
+                MultiStyleItem.Options.MULTI_BUTTON-> {
                     if(j.buttonTitle.contains("清册")) {
                         if (j.necessary == false)
                             result = "${j.buttonTitle.replace("：", "")}没有填完整"
@@ -6069,8 +6078,16 @@ class NetworkAdapter {
                         return false
                     }
                 }
-
-
+                MultiStyleItem.Options.SHIFT_INPUT->{
+                    if(j.necessary==true){
+                        when(j.shiftInputTitle){
+                            "毕业时间"->{
+                                if(j.shiftInputContent=="")
+                                    result = "${j.shiftInputTitle.replace("：", "")}不能为空"
+                            }
+                        }
+                    }
+                }
 
             }
         }

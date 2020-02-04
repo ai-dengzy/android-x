@@ -79,8 +79,11 @@ class FamilyInformationFragment :Fragment(){
             val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_recyclerview,null)
             val rvList:MutableList<MultiStyleItem> = ArrayList()
             rvList.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"子女姓名"))
+            rvList[rvList.size-1].necessary = true
             rvList.add(MultiStyleItem(MultiStyleItem.Options.SELECT_DIALOG, arrayListOf("男","女"),"性别"))
+            rvList[rvList.size-1].necessary = true
             rvList.add(MultiStyleItem(MultiStyleItem.Options.SHIFT_INPUT,"出生日期",false))
+            rvList[rvList.size-1].necessary = true
             rvList[rvList.size-1].jumpListener = View.OnClickListener {
                 val dialog = AlertDialog.Builder(dialogView.context)
                 val mDialogView = layoutInflater.inflate(R.layout.dialog_datepicker,null)
@@ -103,142 +106,297 @@ class FamilyInformationFragment :Fragment(){
             builder.setTitle("子女信息")
                 .setView(dialogView)
                 .setNegativeButton("取消",null)
-                .setPositiveButton("确定",object : DialogInterface.OnClickListener{
-                    override fun onClick(p0: DialogInterface?, p1: Int) {
-
-                        val result = Observable.create<RequestBody> {
-                            //json.remove(key)
-                            //val imagePath = upImage(key)
-                            //var jsonObject= json.put(key,upImage(key))
-                            val date = java.sql.Date.valueOf(rvList[rvList.size-1].shiftInputContent)
-                            val sex:Long = if(rvList[1].selectContent=="男") 1 else 2
-                            val jsonObject = JSONObject().put("childrenName", rvList[0].inputSingleContent)
-                                .put("childrenSex",sex)
-                                .put("childrenBirthDate",date)
-                            Log.i("json ,,", jsonObject.toString())
-                            val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString())
-                            it.onNext(requestBody)
-                        }.subscribe {
-                            val result =
-                                startSendMessage(it, UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.insertHomeChildren).observeOn(AndroidSchedulers.mainThread())
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe(
-                                        {
-                                            val json = JSONObject(it.string())
-                                            Log.i("ResponseBody is" , json.toString())
-                                            val message = json.getString("message")
-                                            if (json.getInt("code") == 200) {
-                                                Log.i("code is ",json.getString("code"))
-                                                var mList = adapter.mData.toMutableList()
-                                                val mItem = MultiStyleItem(MultiStyleItem.Options.FOUR_DISPLAY,rvList[0].inputSingleContent,rvList[1].selectContent,rvList[2].shiftInputContent,"···")
-                                                mList.add(mItem)
-                                                adapter.mData = mList
-                                                adapter.mData[adapter.mData.size-1].fourDisplayListener = View.OnClickListener {
-                                                    val values: Array<String> = arrayOf("修改", "删除")
-                                                    val alertBuilder = AlertDialog.Builder(context!!)
-                                                    alertBuilder.setItems(values, DialogInterface.OnClickListener { dialogInterface, i ->
-                                                        if (values[i] == "删除") {
-                                                            val position = adapter.mData.indexOf(mItem)
-                                                            val result = deleteChildren(
-                                                                message
-                                                            ).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
-                                                                .subscribe( {
-                                                                    if (JSONObject(it.string()).getInt("code") == 200){
-                                                                        Log.i("position is",position.toString())
-                                                                        val mList = adapter.mData.toMutableList()
-                                                                        mList.removeAt(position)
-                                                                        adapter.mData = mList
-                                                                        Log.i("mList size is",mList.size.toString())
-                                                                        adapter.notifyDataSetChanged()
-                                                                        Log.i("adapter size is",adapter.mData.size.toString())
-                                                                    }
-                                                                },{
-                                                                    it.printStackTrace()
-                                                                })
-                                                        } else if (values[i] == "修改") {
-                                                            val builder = AlertDialog.Builder(context!!)
-                                                            val v = View.inflate(context, R.layout.dialog_recyclerview, null)
-                                                            val data: MutableList<MultiStyleItem> = ArrayList()
-                                                            data.clear()
-                                                            data.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"子女姓名"))
-                                                            data[data.size-1].inputSingleContent=adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayTitle
-                                                            data.add(MultiStyleItem(MultiStyleItem.Options.SELECT_DIALOG, arrayListOf("男","女"),"性别"))
-                                                            data[data.size-1].selectContent=adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayContent1
-                                                            data.add(MultiStyleItem(MultiStyleItem.Options.SHIFT_INPUT,"出生日期",false))
-                                                            data[data.size-1].shiftInputContent=adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayContent2
-                                                            data[data.size-1].jumpListener = View.OnClickListener {
-                                                                val dialog = AlertDialog.Builder(dialogView.context)
-                                                                val mDialogView = layoutInflater.inflate(R.layout.dialog_datepicker,null)
-                                                                if(data[data.size-1].shiftInputContent!="") {
-                                                                    val s = data[data.size-1].shiftInputContent.split("-")
-                                                                    mDialogView.date_picker.init(s[0].toInt(),s[1].toInt()-1,s[2].toInt(),null)
-                                                                }
-                                                                dialog.setTitle("出生日期")
-                                                                    .setView(mDialogView)
-                                                                    .setNegativeButton("取消",null)
-                                                                    .setPositiveButton("确定", DialogInterface.OnClickListener() { _, _ ->
-                                                                        data[data.size-1].shiftInputContent =  "${mDialogView.date_picker.year}-${mDialogView.date_picker.month + 1}-${mDialogView.date_picker.dayOfMonth}"
-                                                                        v.rv_dialog.adapter = RecyclerviewAdapter(data)
-                                                                    })
-                                                                    .create()
-                                                                    .show()
-                                                            }
-                                                            val mAdapter = RecyclerviewAdapter(data)
-                                                            v.rv_dialog.adapter = mAdapter
-                                                            v.rv_dialog.layoutManager = LinearLayoutManager(v.context)
-                                                            builder.setTitle("子女信息")
-                                                                .setCancelable(true)
-                                                                .setNegativeButton("取消", null)
-                                                                .setPositiveButton("确定", DialogInterface.OnClickListener { dialogInterface, i ->
-                                                                    val date = java.sql.Date.valueOf(data[data.size-1].shiftInputContent)
-                                                                    val result = Observable.create<RequestBody> {
-                                                                        val sex:Long = if(data[1].selectContent=="男") 1 else 2
-                                                                        val jsonObject = JSONObject().put("childrenName", data[0].inputSingleContent)
-                                                                            .put("childrenSex",sex)
-                                                                            .put("childrenBirthDate",date)
-                                                                            .put("id",message)
-                                                                        Log.i("json ,,", jsonObject.toString())
-                                                                        val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString())
-                                                                        it.onNext(requestBody)
-                                                                    }.subscribe {
-                                                                        val result =
-                                                                            putSimpleMessage(it, UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.updateHomeChildren).observeOn(AndroidSchedulers.mainThread())
-                                                                                .subscribeOn(Schedulers.io())
-                                                                                .subscribe(
-                                                                                    {
-                                                                                        //                                                        Toast.makeText(context,it.string(),Toast.LENGTH_SHORT).show()
-                                                                                        if (JSONObject(it.string()).getInt("code") == 200) {
-                                                                                            adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayTitle = data[0].inputSingleContent
-                                                                                            adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayContent1 = data[1].selectContent
-                                                                                            adapter.mData[adapter.mData.indexOf(mItem)].fourDisplayContent2 = date.toString()
-                                                                                            adapter.notifyItemChanged(adapter.mData.indexOf(mItem))
+                .setPositiveButton("确定",null)
+            val dialog = builder.create()
+            dialog.setOnShowListener(object :DialogInterface.OnShowListener{
+                override fun onShow(p0: DialogInterface?) {
+                    val btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    btnPositive.setOnClickListener {
+                        val networkAdapter = NetworkAdapter(rvList,context!!)
+                        if(networkAdapter.check()) {
+                            val result = Observable.create<RequestBody> {
+                                //json.remove(key)
+                                //val imagePath = upImage(key)
+                                //var jsonObject= json.put(key,upImage(key))
+                                val date =
+                                    java.sql.Date.valueOf(rvList[rvList.size - 1].shiftInputContent)
+                                val sex: Long = if (rvList[1].selectContent == "男") 1 else 2
+                                val jsonObject =
+                                    JSONObject().put("childrenName", rvList[0].inputSingleContent)
+                                        .put("childrenSex", sex)
+                                        .put("childrenBirthDate", date)
+                                Log.i("json ,,", jsonObject.toString())
+                                val requestBody = RequestBody.create(
+                                    MediaType.parse("application/json"),
+                                    jsonObject.toString()
+                                )
+                                it.onNext(requestBody)
+                            }.subscribe {
+                                val result =
+                                    startSendMessage(
+                                        it,
+                                        UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.insertHomeChildren
+                                    ).observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe(
+                                            {
+                                                val json = JSONObject(it.string())
+                                                Log.i("ResponseBody is", json.toString())
+                                                val message = json.getString("message")
+                                                if (json.getInt("code") == 200) {
+                                                    dialog.dismiss()
+                                                    Log.i("code is ", json.getString("code"))
+                                                    var mList = adapter.mData.toMutableList()
+                                                    val mItem = MultiStyleItem(
+                                                        MultiStyleItem.Options.FOUR_DISPLAY,
+                                                        rvList[0].inputSingleContent,
+                                                        rvList[1].selectContent,
+                                                        rvList[2].shiftInputContent,
+                                                        "···"
+                                                    )
+                                                    mList.add(mItem)
+                                                    adapter.mData = mList
+                                                    adapter.mData[adapter.mData.size - 1].fourDisplayListener =
+                                                        View.OnClickListener {
+                                                            val values: Array<String> =
+                                                                arrayOf("修改", "删除")
+                                                            val alertBuilder =
+                                                                AlertDialog.Builder(context!!)
+                                                            alertBuilder.setItems(
+                                                                values,
+                                                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                                                    if (values[i] == "删除") {
+                                                                        val position =
+                                                                            adapter.mData.indexOf(
+                                                                                mItem
+                                                                            )
+                                                                        val result = deleteChildren(
+                                                                            message
+                                                                        ).observeOn(
+                                                                            AndroidSchedulers.mainThread()
+                                                                        )
+                                                                            .subscribeOn(Schedulers.io())
+                                                                            .subscribe({
+                                                                                if (JSONObject(it.string()).getInt(
+                                                                                        "code"
+                                                                                    ) == 200
+                                                                                ) {
+                                                                                    Log.i(
+                                                                                        "position is",
+                                                                                        position.toString()
+                                                                                    )
+                                                                                    val mList =
+                                                                                        adapter.mData.toMutableList()
+                                                                                    mList.removeAt(
+                                                                                        position
+                                                                                    )
+                                                                                    adapter.mData =
+                                                                                        mList
+                                                                                    Log.i(
+                                                                                        "mList size is",
+                                                                                        mList.size.toString()
+                                                                                    )
+                                                                                    adapter.notifyDataSetChanged()
+                                                                                    Log.i(
+                                                                                        "adapter size is",
+                                                                                        adapter.mData.size.toString()
+                                                                                    )
+                                                                                }
+                                                                            }, {
+                                                                                it.printStackTrace()
+                                                                            })
+                                                                    } else if (values[i] == "修改") {
+                                                                        val builder =
+                                                                            AlertDialog.Builder(
+                                                                                context!!
+                                                                            )
+                                                                        val v = View.inflate(
+                                                                            context,
+                                                                            R.layout.dialog_recyclerview,
+                                                                            null
+                                                                        )
+                                                                        val data: MutableList<MultiStyleItem> =
+                                                                            ArrayList()
+                                                                        data.clear()
+                                                                        data.add(
+                                                                            MultiStyleItem(
+                                                                                MultiStyleItem.Options.SINGLE_INPUT,
+                                                                                "子女姓名"
+                                                                            )
+                                                                        )
+                                                                        data[data.size - 1].inputSingleContent =
+                                                                            adapter.mData[adapter.mData.indexOf(
+                                                                                mItem
+                                                                            )].fourDisplayTitle
+                                                                        data[data.size - 1].necessary = true
+                                                                        data.add(
+                                                                            MultiStyleItem(
+                                                                                MultiStyleItem.Options.SELECT_DIALOG,
+                                                                                arrayListOf(
+                                                                                    "男",
+                                                                                    "女"
+                                                                                ),
+                                                                                "性别"
+                                                                            )
+                                                                        )
+                                                                        data[data.size - 1].selectContent =
+                                                                            adapter.mData[adapter.mData.indexOf(
+                                                                                mItem
+                                                                            )].fourDisplayContent1
+                                                                        data[data.size - 1].necessary = true
+                                                                        data.add(
+                                                                            MultiStyleItem(
+                                                                                MultiStyleItem.Options.SHIFT_INPUT,
+                                                                                "出生日期",
+                                                                                false
+                                                                            )
+                                                                        )
+                                                                        data[data.size - 1].shiftInputContent =
+                                                                            adapter.mData[adapter.mData.indexOf(
+                                                                                mItem
+                                                                            )].fourDisplayContent2
+                                                                        data[data.size - 1].necessary = true
+                                                                        data[data.size - 1].jumpListener =
+                                                                            View.OnClickListener {
+                                                                                val dialog =
+                                                                                    AlertDialog.Builder(
+                                                                                        dialogView.context
+                                                                                    )
+                                                                                val mDialogView =
+                                                                                    layoutInflater.inflate(
+                                                                                        R.layout.dialog_datepicker,
+                                                                                        null
+                                                                                    )
+                                                                                if (data[data.size - 1].shiftInputContent != "") {
+                                                                                    val s =
+                                                                                        data[data.size - 1].shiftInputContent.split(
+                                                                                            "-"
+                                                                                        )
+                                                                                    mDialogView.date_picker.init(
+                                                                                        s[0].toInt(),
+                                                                                        s[1].toInt() - 1,
+                                                                                        s[2].toInt(),
+                                                                                        null
+                                                                                    )
+                                                                                }
+                                                                                dialog.setTitle("出生日期")
+                                                                                    .setView(
+                                                                                        mDialogView
+                                                                                    )
+                                                                                    .setNegativeButton(
+                                                                                        "取消",
+                                                                                        null
+                                                                                    )
+                                                                                    .setPositiveButton(
+                                                                                        "确定",
+                                                                                        DialogInterface.OnClickListener() { _, _ ->
+                                                                                            data[data.size - 1].shiftInputContent =
+                                                                                                "${mDialogView.date_picker.year}-${mDialogView.date_picker.month + 1}-${mDialogView.date_picker.dayOfMonth}"
+                                                                                            v.rv_dialog.adapter =
+                                                                                                RecyclerviewAdapter(
+                                                                                                    data
+                                                                                                )
+                                                                                        })
+                                                                                    .create()
+                                                                                    .show()
+                                                                            }
+                                                                        val mAdapter =
+                                                                            RecyclerviewAdapter(data)
+                                                                        v.rv_dialog.adapter =
+                                                                            mAdapter
+                                                                        v.rv_dialog.layoutManager =
+                                                                            LinearLayoutManager(v.context)
+                                                                        builder.setTitle("子女信息")
+                                                                            .setCancelable(true)
+                                                                            .setNegativeButton(
+                                                                                "取消",
+                                                                                null
+                                                                            )
+                                                                            .setPositiveButton("确定",null)
+                                                                            .setView(v)
+                                                                        val dialog =
+                                                                            builder.create()
+                                                                        dialog.setOnShowListener(object :DialogInterface.OnShowListener{
+                                                                            override fun onShow(p0: DialogInterface?) {
+                                                                                val btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                                                                                btnPositive.setOnClickListener {
+                                                                                    val networkAdapter = NetworkAdapter(data,context!!)
+                                                                                    if(networkAdapter.check()) {
+                                                                                        val date =
+                                                                                            java.sql.Date.valueOf(data[data.size - 1].shiftInputContent)
+                                                                                        val result = Observable.create<RequestBody> {
+                                                                                            //json.remove(key)
+                                                                                            //val imagePath = upImage(key)
+                                                                                            //var jsonObject= json.put(key,upImage(key))
+                                                                                            val sex: Long = if (data[1].selectContent == "男") 1 else 2
+                                                                                            val jsonObject =
+                                                                                                json.put("childrenName", data[0].inputSingleContent)
+                                                                                                    .put("childrenSex", sex)
+                                                                                                    .put("childrenBirthDate", date)
+                                                                                            Log.i("json ,,", jsonObject.toString())
+                                                                                            val requestBody = RequestBody.create(
+                                                                                                MediaType.parse("application/json"),
+                                                                                                jsonObject.toString()
+                                                                                            )
+                                                                                            it.onNext(requestBody)
+                                                                                        }.subscribe {
+                                                                                            val result =
+                                                                                                putSimpleMessage(
+                                                                                                    it,
+                                                                                                    UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.updateHomeChildren
+                                                                                                ).observeOn(AndroidSchedulers.mainThread())
+                                                                                                    .subscribeOn(Schedulers.io())
+                                                                                                    .subscribe(
+                                                                                                        {
+                                                                                                            //                                                        Toast.makeText(context,it.string(),Toast.LENGTH_SHORT).show()
+                                                                                                            if (JSONObject(it.string()).getInt("code") == 200) {
+                                                                                                                dialog.dismiss()
+                                                                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayTitle =
+                                                                                                                    data[0].inputSingleContent
+                                                                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent1 =
+                                                                                                                    data[1].selectContent
+                                                                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent2 =
+                                                                                                                    date.toString()
+                                                                                                                adapter.notifyItemChanged(
+                                                                                                                    adapter.mData.indexOf(
+                                                                                                                        item
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            }
+                                                                                                        },
+                                                                                                        {
+                                                                                                            it.printStackTrace()
+                                                                                                        }
+                                                                                                    )
                                                                                         }
-                                                                                    },
-                                                                                    {
-                                                                                        it.printStackTrace()
                                                                                     }
-                                                                                )
+                                                                                }
+                                                                            }
+
+                                                                        })
+                                                                        dialog.show()
+                                                                        dialog.window.clearFlags(
+                                                                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                                                                        )
+                                                                        dialog.window.setSoftInputMode(
+                                                                            WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+                                                                        )
                                                                     }
-                                                                })
-                                                                .setView(v)
-                                                            val dialog = builder.create()
-                                                            dialog.show()
-                                                            dialog.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-                                                            dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+                                                                }).show()
                                                         }
-                                                    }).show()
+                                                    adapter.notifyItemInserted(mList.size - 1)
                                                 }
-                                                adapter.notifyItemInserted(mList.size-1)
+                                            },
+                                            {
+                                                it.printStackTrace()
                                             }
-                                        },
-                                        {
-                                            it.printStackTrace()
-                                        }
-                                    )
+                                        )
+                            }
                         }
                     }
-                })
-            val dialog = builder.create()
+                }
+
+            })
             dialog.show()
             dialog.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
             dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
@@ -282,10 +440,13 @@ class FamilyInformationFragment :Fragment(){
                         val data: MutableList<MultiStyleItem> = ArrayList()
                         data.clear()
                         data.add(MultiStyleItem(MultiStyleItem.Options.SINGLE_INPUT,"子女姓名"))
+                        data[data.size-1].necessary = true
                         data[data.size-1].inputSingleContent=adapter.mData[adapter.mData.indexOf(item)].fourDisplayTitle
                         data.add(MultiStyleItem(MultiStyleItem.Options.SELECT_DIALOG, arrayListOf("男","女"),"性别"))
+                        data[data.size-1].necessary = true
                         data[data.size-1].selectContent=adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent1
                         data.add(MultiStyleItem(MultiStyleItem.Options.SHIFT_INPUT,"出生日期",false))
+                        data[data.size-1].necessary = true
                         data[data.size-1].shiftInputContent=adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent2
                         data[data.size-1].jumpListener = View.OnClickListener {
                             val dialog = AlertDialog.Builder(dialogView.context)
@@ -310,41 +471,67 @@ class FamilyInformationFragment :Fragment(){
                         builder.setTitle("子女信息")
                             .setCancelable(true)
                             .setNegativeButton("取消", null)
-                            .setPositiveButton("确定", DialogInterface.OnClickListener { dialogInterface, i ->
-                                val date = java.sql.Date.valueOf(data[data.size-1].shiftInputContent)
-                                val result = Observable.create<RequestBody> {
-                                    //json.remove(key)
-                                    //val imagePath = upImage(key)
-                                    //var jsonObject= json.put(key,upImage(key))
-                                    val sex:Long = if(data[1].selectContent=="男") 1 else 2
-                                    val jsonObject = json.put("childrenName", data[0].inputSingleContent)
-                                            .put("childrenSex",sex)
-                                        .put("childrenBirthDate",date)
-                                    Log.i("json ,,", jsonObject.toString())
-                                    val requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString())
-                                    it.onNext(requestBody)
-                                }.subscribe {
-                                    val result =
-                                        putSimpleMessage(it, UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.updateHomeChildren).observeOn(AndroidSchedulers.mainThread())
-                                            .subscribeOn(Schedulers.io())
-                                            .subscribe(
-                                                {
-                                                    //                                                        Toast.makeText(context,it.string(),Toast.LENGTH_SHORT).show()
-                                                    if (JSONObject(it.string()).getInt("code") == 200) {
-                                                        adapter.mData[adapter.mData.indexOf(item)].fourDisplayTitle = data[0].inputSingleContent
-                                                        adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent1 = data[1].selectContent
-                                                        adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent2 = date.toString()
-                                                        adapter.notifyItemChanged(adapter.mData.indexOf(item))
-                                                    }
-                                                },
-                                                {
-                                                    it.printStackTrace()
-                                                }
-                                            )
-                                }
-                            })
+                            .setPositiveButton("确定",null)
                             .setView(v)
                         val dialog = builder.create()
+                        dialog.setOnShowListener(object :DialogInterface.OnShowListener{
+                            override fun onShow(p0: DialogInterface?) {
+                                val btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                                btnPositive.setOnClickListener {
+                                    val networkAdapter = NetworkAdapter(data,context!!)
+                                    if(networkAdapter.check()) {
+                                        val date =
+                                            java.sql.Date.valueOf(data[data.size - 1].shiftInputContent)
+                                        val result = Observable.create<RequestBody> {
+                                            //json.remove(key)
+                                            //val imagePath = upImage(key)
+                                            //var jsonObject= json.put(key,upImage(key))
+                                            val sex: Long = if (data[1].selectContent == "男") 1 else 2
+                                            val jsonObject =
+                                                json.put("childrenName", data[0].inputSingleContent)
+                                                    .put("childrenSex", sex)
+                                                    .put("childrenBirthDate", date)
+                                            Log.i("json ,,", jsonObject.toString())
+                                            val requestBody = RequestBody.create(
+                                                MediaType.parse("application/json"),
+                                                jsonObject.toString()
+                                            )
+                                            it.onNext(requestBody)
+                                        }.subscribe {
+                                            val result =
+                                                putSimpleMessage(
+                                                    it,
+                                                    UnSerializeDataBase.mineBasePath + Constants.HttpUrlPath.My.updateHomeChildren
+                                                ).observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribeOn(Schedulers.io())
+                                                    .subscribe(
+                                                        {
+                                                            //                                                        Toast.makeText(context,it.string(),Toast.LENGTH_SHORT).show()
+                                                            if (JSONObject(it.string()).getInt("code") == 200) {
+                                                                dialog.dismiss()
+                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayTitle =
+                                                                    data[0].inputSingleContent
+                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent1 =
+                                                                    data[1].selectContent
+                                                                adapter.mData[adapter.mData.indexOf(item)].fourDisplayContent2 =
+                                                                    date.toString()
+                                                                adapter.notifyItemChanged(
+                                                                    adapter.mData.indexOf(
+                                                                        item
+                                                                    )
+                                                                )
+                                                            }
+                                                        },
+                                                        {
+                                                            it.printStackTrace()
+                                                        }
+                                                    )
+                                        }
+                                    }
+                                }
+                            }
+
+                        })
                         dialog.show()
                         dialog.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
                         dialog.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)

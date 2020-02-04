@@ -111,9 +111,15 @@ class EnterpriseCertificationFragment :Fragment(){
 
         mView.view_subject_category_sp.setOnClickListener{
             val Option1Items = listOf("供应商","建设单位","设计单位","施工单位","监理单位","咨询单位","职能部门","其他")
-            val Option2Items:List<List<String>> = listOf(listOf(""),listOf("材料供应","机械租赁","技术服务","金融服务"), listOf("政府单位","事业单位","企业"),listOf(""),
+            val Option2Items:List<List<String>> = listOf(
+                listOf("材料供应","劳资派遣","机械租赁","技术服务","金融服务"),
+                listOf("政府单位","事业单位","企业"),
+                listOf(""),
                 listOf("施工企业","施工队","项目部"),
-                listOf(""),listOf("安监部","质检部"),listOf(""))
+                listOf(""),
+                listOf(""),
+                listOf("安监部","质检部"),
+                listOf(""))
             val selectDialog= CustomDialog(CustomDialog.Options.TWO_OPTIONS_SELECT_DIALOG,context!!,mHandler,Option1Items,Option2Items).multiDialog
             selectDialog.show()
         }

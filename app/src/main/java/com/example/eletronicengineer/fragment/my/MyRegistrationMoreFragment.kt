@@ -1,5 +1,7 @@
 package com.example.eletronicengineer.fragment.my
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.electric.engineering.model.MultiStyleItem
 import com.example.eletronicengineer.R
+import com.example.eletronicengineer.activity.DemandDisplayActivity
 import com.example.eletronicengineer.activity.MyReleaseActivity
 import com.example.eletronicengineer.adapter.RecyclerviewAdapter
 import com.example.eletronicengineer.custom.LoadingDialog
@@ -40,11 +43,12 @@ class MyRegistrationMoreFragment :Fragment(){
     var type = -1
     var frame = R.id.frame_my_registration
     val gson = GsonBuilder().create()
+    var phone = ""
+    lateinit var id:String
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mView = inflater.inflate(R.layout.fragment_my_registration_more,container,false)
         type = arguments!!.getInt("type")
-        if(activity is MyReleaseActivity)
-            frame = R.id.frame_my_release
+
         initFragment()
         return mView
     }
@@ -52,6 +56,23 @@ class MyRegistrationMoreFragment :Fragment(){
     private fun initFragment() {
         mView.tv_my_registration_back.setOnClickListener {
             activity!!.supportFragmentManager.popBackStackImmediate()
+        }
+        if(activity is MyReleaseActivity){
+            frame = R.id.frame_my_release
+            mView.btn_more.text = "联系对方"
+            mView.btn_more.setOnClickListener {
+                val intent = Intent(Intent.ACTION_DIAL)
+                intent.setData(Uri.parse("tel:${phone}"))
+                startActivity(intent)
+            }
+        }else{
+            mView.btn_more.text = "查看需求信息"
+            mView.btn_more.setOnClickListener {
+                val intent = Intent(activity, DemandDisplayActivity::class.java)
+                intent.putExtra("type",arguments!!.getInt("selectType"))
+                intent.putExtra("id",id)
+                activity!!.startActivity(intent)
+            }
         }
         initData()
     }
@@ -66,9 +87,12 @@ class MyRegistrationMoreFragment :Fragment(){
             Constants.FragmentType.DEMAND_INDIVIDUAL_TYPE.ordinal-> {
                 adapter = adapterGenerate.registrationDisplayDemandIndividual()
                 val requirementPersonalRegistrationEntity = gson.fromJson(arguments!!.getString("demandIndividual"),RequirementPersonalRegistrationEntity::class.java)
+                id = requirementPersonalRegistrationEntity.personRequirementInformationCheck.requirementPersonId!!
+                adapter.mData[0].singleDisplayRightContent = requirementPersonalRegistrationEntity.requirementVariety
                 adapter.mData[1].singleDisplayRightContent = requirementPersonalRegistrationEntity.requirementMajor
                 adapter.mData[2].singleDisplayRightContent = requirementPersonalRegistrationEntity.name
                 adapter.mData[3].singleDisplayRightContent = requirementPersonalRegistrationEntity.phone
+                phone = requirementPersonalRegistrationEntity.phone
                 adapter.mData[4].jumpListener = View.OnClickListener {
                     val enrollProvideCrewList = requirementPersonalRegistrationEntity.enrollProvideCrewList
                     if(enrollProvideCrewList!=null){
@@ -87,11 +111,14 @@ class MyRegistrationMoreFragment :Fragment(){
                     val loadDialog = LoadingDialog(mView.context,"正在删除...")
                     loadDialog.show()
                     val result =
-                        deletePersonRequirementInformationCheck(requirementPersonalRegistrationEntity.personRequirementInformationCheck.id)
+                        (if(activity is MyReleaseActivity)
+                            deletePersonRequirementInformationCheckByIdIssuer(requirementPersonalRegistrationEntity.personRequirementInformationCheck.id)
+                        else
+                            deletePersonRequirementInformationCheck(requirementPersonalRegistrationEntity.personRequirementInformationCheck.id))
                             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                                 loadDialog.dismiss()
                                 val json = JSONObject(it.string())
-                                if(json.getInt("code")==200){
+                                if(json.getInt("code")==200 && json.getString("desc")=="OK"){
                                     activity!!.supportFragmentManager.popBackStackImmediate()
                                     ToastHelper.mToast(mView.context,"删除成功")
                                 }else{
@@ -107,9 +134,11 @@ class MyRegistrationMoreFragment :Fragment(){
             Constants.FragmentType.DEMAND_GROUP_TYPE.ordinal-> {
                 adapter = adapterGenerate.registrationDisplayDemandGroup()
                 val requirementTeamRegistrationEntity = gson.fromJson(arguments!!.getString("demandGroup"),RequirementTeamRegistrationEntity::class.java)
+                id = requirementTeamRegistrationEntity.requirementTeamLoggingCheck.requirementCaravanTransportId
                 adapter.mData[0].singleDisplayRightContent = requirementTeamRegistrationEntity.requirementTeamLoggingCheck.type
                 adapter.mData[1].singleDisplayRightContent = requirementTeamRegistrationEntity.name
                 adapter.mData[2].singleDisplayRightContent = requirementTeamRegistrationEntity.phone
+                phone = requirementTeamRegistrationEntity.phone
                 adapter.mData[3].jumpListener = View.OnClickListener {
                     val enrollProvideCrewLists = requirementTeamRegistrationEntity.enrollProvideCrewLists
                     if(enrollProvideCrewLists!=null){
@@ -151,11 +180,14 @@ class MyRegistrationMoreFragment :Fragment(){
                     val loadDialog = LoadingDialog(mView.context,"正在删除...")
                     loadDialog.show()
                     val result =
-                        deleteRequirementTeamLoggingCheck(requirementTeamRegistrationEntity.requirementTeamLoggingCheck.id)
+                        (if(activity is MyReleaseActivity)
+                            deleteRequirementTeamLoggingCheckByIdIssuer(requirementTeamRegistrationEntity.requirementTeamLoggingCheck.id)
+                        else
+                            deleteRequirementTeamLoggingCheck(requirementTeamRegistrationEntity.requirementTeamLoggingCheck.id))
                             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                                 loadDialog.dismiss()
                                 val json = JSONObject(it.string())
-                                if(json.getInt("code")==200){
+                                if(json.getInt("code")==200 && json.getString("desc")=="OK" ){
                                     activity!!.supportFragmentManager.popBackStackImmediate()
                                     ToastHelper.mToast(mView.context,"删除成功")
                                 }else{
@@ -167,10 +199,15 @@ class MyRegistrationMoreFragment :Fragment(){
                                 it.printStackTrace()
                             })
                 }
+                if(adapter.mData[5].singleDisplayRightTitle=="机械设备" && requirementTeamRegistrationEntity.enrollMachineries==null){
+                    val mData = adapter.mData.toMutableList()
+                    mData.removeAt(5)
+                    adapter.mData = mData
+                }
                 when(requirementTeamRegistrationEntity.requirementTeamLoggingCheck.type){
                     "马帮运输"->{
                         val mData = adapter.mData.toMutableList()
-                        for (j in 0 until 3)
+                        for (j in 0 until 2)
                             mData.removeAt(3)
                         adapter.mData = mData
                     }
@@ -185,9 +222,11 @@ class MyRegistrationMoreFragment :Fragment(){
                 adapter = adapterGenerate.registrationDisplayDemandLease()
                 val requirementLeaseRegistrationEntity = gson.fromJson(arguments!!.getString("demandLease"),
                     RequirementLeaseRegistrationEntity::class.java)
+                id = requirementLeaseRegistrationEntity.leaseLoggingCheck.requirementLeaseMachineryId
                 adapter.mData[0].singleDisplayRightContent = requirementLeaseRegistrationEntity.leaseLoggingCheck.type
                 adapter.mData[1].singleDisplayRightContent = requirementLeaseRegistrationEntity.name
                 adapter.mData[2].singleDisplayRightContent = requirementLeaseRegistrationEntity.phone
+                phone = requirementLeaseRegistrationEntity.phone
                 if(adapter.mData[0].singleDisplayRightContent.contains("车辆")){
                     adapter.mData[3].singleDisplayRightTitle = "车辆清册"
                     adapter.mData[3].jumpListener = View.OnClickListener {
@@ -222,11 +261,14 @@ class MyRegistrationMoreFragment :Fragment(){
                     val loadDialog = LoadingDialog(mView.context,"正在删除...")
                     loadDialog.show()
                     val result =
-                        deleteLeaseLoggingCheckController(requirementLeaseRegistrationEntity.leaseLoggingCheck.id)
+                        (if(activity is MyReleaseActivity)
+                            deleteLeaseLoggingCheckControllerByIdIssuer(requirementLeaseRegistrationEntity.leaseLoggingCheck.id)
+                        else
+                            deleteLeaseLoggingCheckController(requirementLeaseRegistrationEntity.leaseLoggingCheck.id))
                             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                                 loadDialog.dismiss()
                                 val json = JSONObject(it.string())
-                                if(json.getInt("code")==200){
+                                if(json.getInt("code")==200 && json.getString("desc")=="OK" ) {
                                     activity!!.supportFragmentManager.popBackStackImmediate()
                                     ToastHelper.mToast(mView.context,"删除成功")
                                 }else{
@@ -244,9 +286,11 @@ class MyRegistrationMoreFragment :Fragment(){
             Constants.FragmentType.DEMAND_TRIPARTITE_TYPE.ordinal-> {
                 adapter = adapterGenerate.registrationDisplayDemandTripartite()
                 val requirementThirdRegistrationEntity = gson.fromJson(arguments!!.getString("demandTripartite"),RequirementThirdRegistrationEntity::class.java)
+                id = requirementThirdRegistrationEntity.requirementThirdLoggingCheck.requirementThirdPartyId!!
                 adapter.mData[0].singleDisplayRightContent = requirementThirdRegistrationEntity.requirementVariety
                 adapter.mData[1].singleDisplayRightContent = requirementThirdRegistrationEntity.name
                 adapter.mData[2].singleDisplayRightContent = requirementThirdRegistrationEntity.phone
+                phone = requirementThirdRegistrationEntity.phone
                 adapter.mData[3].jumpListener = View.OnClickListener {
                     val enrollThirdLists = requirementThirdRegistrationEntity.enrollThirdLists
                     if(enrollThirdLists!=null){
@@ -265,11 +309,14 @@ class MyRegistrationMoreFragment :Fragment(){
                     val loadDialog = LoadingDialog(mView.context,"正在删除...")
                     loadDialog.show()
                     val result =
-                        deleteRequirementThirdLoggingCheck(requirementThirdRegistrationEntity.requirementThirdLoggingCheck.id)
+                        (if(activity is MyReleaseActivity)
+                            deleteRequirementThirdLoggingCheckByIdIssuer(requirementThirdRegistrationEntity.requirementThirdLoggingCheck.id)
+                        else
+                            deleteRequirementThirdLoggingCheck(requirementThirdRegistrationEntity.requirementThirdLoggingCheck.id))
                             .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                                 loadDialog.dismiss()
                                 val json = JSONObject(it.string())
-                                if(json.getInt("code")==200){
+                                if(json.getInt("code")==200 && json.getString("desc")=="OK" ){
                                     activity!!.supportFragmentManager.popBackStackImmediate()
                                     ToastHelper.mToast(mView.context,"删除成功")
                                 }else{

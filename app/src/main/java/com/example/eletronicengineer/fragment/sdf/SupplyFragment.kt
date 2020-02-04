@@ -452,7 +452,7 @@ class SupplyFragment:Fragment(){
             Constants.FragmentType.PERSONAL_REGISTRATION_CLASS_TYPE.ordinal->{
                 adapter=adapterGenerate.PersonalService()
                 val singleDisplayRightContent = "注册类"
-                val selectOption1Items: List<String> = listOf("造价工程师", "一级建造师", "安全工程师", "电气工程师")
+                val selectOption1Items: List<String> = listOf("造价工程师", "一级建造师","二级建造师", "安全工程师", "电气工程师")
                 adapter.mData[0].singleDisplayRightContent = singleDisplayRightContent
                 adapter.mData[1].selectOption1Items = selectOption1Items
             }
@@ -618,7 +618,26 @@ class SupplyFragment:Fragment(){
     override fun onDestroyView() {
         super.onDestroyView()
     }
+    fun check(itemMultiStyleItem:List<MultiStyleItem>):Boolean{
+
+        for(j in itemMultiStyleItem)
+        {
+            when (j.options) {
+                MultiStyleItem.Options.SHIFT_INPUT -> {
+                    if (j.necessary == false) {
+                        return false
+                    }
+                }
+            }
+        }
+
+        return true
+    }
     fun update(itemMultiStyleItem:List<MultiStyleItem>){
+        if(check(itemMultiStyleItem))
+        {
+            mAdapter!!.mData[mAdapter!!.mData[0].selected].submitIsNecessary = true
+        }
         Log.i("position is",mAdapter!!.mData[0].selected.toString())
         mAdapter!!.mData[mAdapter!!.mData[0].selected].itemMultiStyleItem = itemMultiStyleItem
         Log.i("item size",mAdapter!!.mData[mAdapter!!.mData[0].selected].itemMultiStyleItem.size.toString())
