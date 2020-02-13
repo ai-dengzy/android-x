@@ -109,7 +109,7 @@ class SupplyActivity : AppCompatActivity() {
 					NetworkAdapter(this).upImage(mImagePaths[0],fragment)
 				}
 				Constants.RequestCode.REQUEST_PICK_FILE.ordinal -> {
-					val fragment=this@SupplyActivity.supportFragmentManager.findFragmentByTag("inventoryMore")!!
+					val fragment=this@SupplyActivity.supportFragmentManager.findFragmentByTag("register")!!
 					val uri = data!!.data
 					var path:String?=null
 					if(!isWordOrPdf(getRealPathFromURI(uri)!!) && !isWordOrPdf(uri.toString()))

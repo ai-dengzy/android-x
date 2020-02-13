@@ -1391,7 +1391,7 @@ class DemandDisplayFragment:Fragment() {
                             " " } else{ data.journeyCarFare}
                         adapter.mData[8].singleDisplayRightContent=if(data.journeySalary==null) {
                             " " } else{ data.journeySalary}
-                        if(data.salaryUnit=="面议"||data.salaryStandard=="-1.00"){
+                        if(data.salaryUnit=="面议"||data.salaryStandard=="-1.00"||data.salaryStandard==null){
                             adapter.mData[9].singleDisplayRightContent= "面议"
                         }else {
                             adapter.mData[9].singleDisplayRightContent= "${data.salaryStandard} ${data.salaryUnit}"

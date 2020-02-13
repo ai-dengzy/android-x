@@ -1180,7 +1180,7 @@ class AdapterGenerate {
         for(i in styleTypeNum){
             adapter.mData[i].styleType="NUMBER"//限制为数字类型
         }
-        val necessaryNum = arrayListOf(2,3,4,5,9,12)
+        val necessaryNum = arrayListOf(2,3,4,5,12)
         for(j in necessaryNum){
             adapter.mData[j].necessary= true//true为必选项
         }
@@ -1401,7 +1401,7 @@ class AdapterGenerate {
         for(i in styleTypeNum){
             adapter.mData[i].styleType="NUMBER"//限制为数字类型
         }
-        val necessaryNum = arrayListOf(1,2,4,5,9)
+        val necessaryNum = arrayListOf(1,2,3,4,5,9)
         for(j in necessaryNum){
             adapter.mData[j].necessary= true//true为必选项
         }
@@ -1817,7 +1817,7 @@ class AdapterGenerate {
         when(bundle.getInt("type"))
         {
             Constants.FragmentType.TOOL_LEASING_TYPE.ordinal->{
-                mData[7].singleDisplayRightTitle="工器具租赁清单"
+                mData[7].singleDisplayRightTitle="工器具租赁清册"
                 mData[7].buttonListener= arrayListOf( View.OnClickListener {
                     mData[0].selected =7
                     mdata.putString("type","租赁清册发布")
@@ -1825,7 +1825,7 @@ class AdapterGenerate {
                 })
             }
             Constants.FragmentType.MACHINERY_LEASING_TYPE.ordinal->{
-                mData[7].singleDisplayRightTitle="机械租赁清单"
+                mData[7].singleDisplayRightTitle="机械租赁清册"
                 mData[7].buttonListener= arrayListOf( View.OnClickListener {
                     mData[0].selected =7
                     mdata.putString("type","租赁清册发布")
@@ -1833,7 +1833,7 @@ class AdapterGenerate {
                 })
             }
             Constants.FragmentType.EQUIPMENT_LEASING_TYPE.ordinal->{
-                mData[7].singleDisplayRightTitle="设备租赁清单"
+                mData[7].singleDisplayRightTitle="设备租赁清册"
                 mData[7].buttonListener= arrayListOf( View.OnClickListener {
                     mData[0].selected =7
                     mdata.putString("type","租赁清册发布")
@@ -1872,8 +1872,9 @@ class AdapterGenerate {
             mData[0].picturePosition  = 6
             val data = Bundle()
             data.putString("key", mData[6].key)
+            data.putString("title", mData[6].shiftInputTitle)
             data.putInt("total", 1)
-            mData[6].shiftInputPicture
+            data.putString("imagePath",mData[6].shiftInputPicture)
             FragmentHelper.switchFragment(activity,UploadPhoneFragment.newInstance(data), frame, "Capture")
         }
         mData[8].buttonListener = listOf(View.OnClickListener {

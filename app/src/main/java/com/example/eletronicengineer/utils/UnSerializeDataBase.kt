@@ -19,7 +19,7 @@ import java.io.File
  */
 object UnSerializeDataBase
 {
-  const val ip = "www.ycdlfw.com"
+  const val ip = "ycdlfw.com"
 //  const val upmsBasePath = "http://${ip}:8026/"
 //  const val dmsBasePath = "http://${ip}:8012/"
 //  const val mineBasePath = "http://${ip}:8032/"

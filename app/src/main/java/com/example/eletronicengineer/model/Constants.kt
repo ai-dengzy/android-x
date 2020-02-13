@@ -322,8 +322,8 @@ class Constants {
                     "RequirementLeaseConstructionTool/insertRequirementLeaseConstructionTool/"
                 //设备租赁
                 const val requirementLeaseFacility = "RequirementLeaseFacility/insertRequirementLeaseFacility/"
-                //excel模板下载
-                const val excel = "excel/downloadexcel/{fileName}/"
+                //文件下载
+                const val downloadFile = "file/downloadFile/"
 
 
                 /**

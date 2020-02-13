@@ -252,7 +252,7 @@ class MyFragment : Fragment() {
                             }
                             //判断文件夹是否存在 不存在就创建
                             val file = File(filePath)
-                            file.mkdirs()
+//                            file.mkdirs()
                             if(!file.exists()) {
                                 file.mkdirs()
                             }

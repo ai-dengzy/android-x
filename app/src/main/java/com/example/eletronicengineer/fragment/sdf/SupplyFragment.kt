@@ -346,7 +346,7 @@ class SupplyFragment:Fragment(){
                         }
                     }
                     provider.generateJsonRequestBody(json).subscribe {
-                        val loadingDialog = LoadingDialog(mView.context, "正在请求...", R.mipmap.ic_dialog_loading)
+                        val loadingDialog = LoadingDialog(mView.context, "正在发布...", R.mipmap.ic_dialog_loading)
                         loadingDialog.show()
                         val result = startSendMessage(it, UnSerializeDataBase.dmsBasePath+mAdapter!!.urlPath).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
@@ -354,12 +354,12 @@ class SupplyFragment:Fragment(){
                                         loadingDialog.dismiss()
                                         val json = JSONObject(it.string())
                                         if (json.getInt("code") == 200) {
-                                                Toast.makeText(context, "请求成功", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(context, "发布成功", Toast.LENGTH_SHORT).show()
                                                 mView.tv_title_back.callOnClick()
                                         }else if(json.getInt("code") == 403){
                                             Toast.makeText(context, "${json.getString("desc")} 请升级为更高级会员", Toast.LENGTH_SHORT).show()
                                         } else if (json.getInt("code") == 400) {
-                                            Toast.makeText(context, "请求失败", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, "发布失败", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     {

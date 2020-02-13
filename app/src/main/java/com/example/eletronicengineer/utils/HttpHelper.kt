@@ -507,8 +507,8 @@ interface HttpHelper {
     @DELETE(Constants.HttpUrlPath.Professional.deleteMajorDistribuionProject)
     fun deleteMajorDistribuionProject(@Path("id") id: Long): Observable<ResponseBody>
 
-    @POST(Constants.HttpUrlPath.Requirement.excel)
-    fun downloadExcel(@Path("fileName") filename: String): Call<ResponseBody>
+    @POST(Constants.HttpUrlPath.Requirement.downloadFile)
+    fun downloadFile(@Body data:RequestBody): Call<ResponseBody>
 
     @POST("file/uploadImageSample")
     @Multipart
@@ -1432,12 +1432,16 @@ internal fun uploadImage(data: MultipartBody.Part): Observable<ResponseBody> {
     return httpHelper.uploadImage(data).subscribeOn(Schedulers.newThread())
 }
 
-internal fun downloadFile(targetPath: String, targetFileName: String, webFileName: String, baseUrl: String) {
+internal fun downloadFile(targetPath: String, targetFileName: String,requestBody: RequestBody) {
     val okhttp = OkHttpClient.Builder().addInterceptor(ResponseInterceptor()).build()
-    val retrofit = Retrofit.Builder().baseUrl(baseUrl).client(okhttp).build()
+    val retrofit = Retrofit.Builder().baseUrl(UnSerializeDataBase.mineBasePath).client(okhttp).build()
     val file = File(targetPath, targetFileName)
+    val rootFile = File(targetPath)
+    if(!rootFile.exists()) {
+        rootFile.mkdirs()
+    }
     val httpHelper = retrofit.create(HttpHelper::class.java)
-    httpHelper.downloadExcel(webFileName).enqueue(object : Callback<ResponseBody> {
+    httpHelper.downloadFile(requestBody).enqueue(object : Callback<ResponseBody> {
         override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
             t.printStackTrace()
         }

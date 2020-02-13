@@ -22,9 +22,13 @@ import com.example.eletronicengineer.model.Constants
 import com.example.eletronicengineer.utils.*
 import com.example.eletronicengineer.utils.getSupplyMajorNetWork
 import com.example.eletronicengineer.utils.getSupplyPersonDetail
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_supply_display.view.*
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import org.json.JSONObject
 import java.io.Serializable
 
 
@@ -2082,16 +2086,24 @@ class SupplyDisplayFragment:Fragment() {
                         if(data.thirdServicesContractPath==null)
                         {
                             adapter.mData[7].buttonListener = listOf(View.OnClickListener {
-                                Toast.makeText(context,"无图片",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,"无文件",Toast.LENGTH_SHORT).show()
                             })
                         }
                         else
                         {
                             //显示图片
                             adapter.mData[7].buttonListener = listOf(View.OnClickListener {
-                                val intent = Intent(activity, ImageDisplayActivity::class.java)
-                                intent.putExtra("imagePath", data.thirdServicesContractPath)
-                                startActivity(intent)
+                                val result = Observable.create<RequestBody> {
+                                    val jsonObject = JSONObject().put("filePath",data.thirdServicesContractPath)
+                                    val requestBody= RequestBody.create(MediaType.parse("application/json"),jsonObject.toString())
+                                    it.onNext(requestBody)
+                                }.subscribe {
+                                    downloadFile("${UnSerializeDataBase.filePath}/file","三方服务合同."+data.thirdServicesContractPath.substring(data.thirdServicesContractPath.lastIndexOf(".")+1),it)
+                                }
+
+//                                val intent = Intent(activity, ImageDisplayActivity::class.java)
+//                                intent.putExtra("imagePath", data.thirdServicesContractPath)
+//                                startActivity(intent)
                             })
                         }
 

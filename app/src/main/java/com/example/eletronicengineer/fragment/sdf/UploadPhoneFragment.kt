@@ -169,7 +169,9 @@ class UploadPhoneFragment:Fragment(){
 //            mImagePaths[position] = imagePaths
 //        }
         glideImageLoader.displayImage(imageViewContent,imagePaths)
-        val fragment = activity!!.supportFragmentManager.findFragmentByTag("inventoryMore")
+        val fragment = if(activity!!.supportFragmentManager.findFragmentByTag("inventoryMore")==null)
+            activity!!.supportFragmentManager.findFragmentByTag("register") else
+            activity!!.supportFragmentManager.findFragmentByTag("inventoryMore")
         if(fragment is SubmitInventoryItemMoreFragment)
             fragment.refresh(imagePaths,fragment.adapter!!.mData[0].picturePosition)
         else if(fragment is SupplyPublishInventoryItemMoreFragment)

@@ -224,7 +224,7 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
         lateinit var etInputUnitValue:EditText
 
         lateinit var tvShiftInputTitle:TextView
-        lateinit var tvShiftInputContent:TextView
+        lateinit var tvShiftInputContent:EditText
         lateinit var tvShiftInputShow:TextView
         lateinit var ivShiftInputPicture:CircleImageView
         lateinit var viewShiftInputShow:View
@@ -289,7 +289,7 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
 
 
         lateinit var tvsingleDisplayRightTitle:TextView
-        lateinit var tvsingleDisplayRightContent:TextView
+        lateinit var tvsingleDisplayRightContent:EditText
 
         //带菜单项的标题
         lateinit var tvTitle2:TextView
@@ -410,10 +410,14 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 MESSAGE_SELECT_OK->
                 {
                     val selectContent=it.data.getString("selectContent")
-                        tvTextFirstDialog.isCursorVisible = false
-                        tvTextFirstDialog.isFocusable = false
+                    if(selectContent.equals("自定义") || selectContent.equals("其他") ||selectContent.equals("填写")){
+                        tvTextFirstDialog.isEnabled=true
+                        tvTextFirstDialog.hint="请输入"
+                        tvTextFirstDialog.text=""
+                    }else{
+                        tvTextFirstDialog.isEnabled=true
                         tvTextFirstDialog.text=selectContent
-
+                    }
                     false
                 }
                 else->
@@ -428,9 +432,14 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                 MESSAGE_SELECT_OK->
                 {
                     val selectContent=it.data.getString("selectContent")
-
+                    if(selectContent.equals("自定义") || selectContent.equals("其他") ||selectContent.equals("填写")){
+                        tvTextSecondDialog.isEnabled=true
+                        tvTextSecondDialog.hint="请输入"
+                        tvTextSecondDialog.text=""
+                    }else{
+                        tvTextSecondDialog.isEnabled=true
                         tvTextSecondDialog.text=selectContent
-
+                    }
 
                     false
                 }
@@ -1049,11 +1058,15 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                         vh.etSingleInputContent.inputType=InputType.TYPE_CLASS_NUMBER
                         vh.etSingleInputContent.hint="16-60岁"
                     }
-                    "单价","报价清单(按单价)","数量","工作经验"->{
+                    "单价","报价清单(按单价)","数量"->{
                         vh.etSingleInputContent.inputType=InputType.TYPE_CLASS_NUMBER
                     }
                     "法人代表电话","电话","手机号码"->{
                         vh.etSingleInputContent.inputType=InputType.TYPE_CLASS_PHONE
+                    }
+                    "工作经验"->{
+                        vh.etSingleInputContent.inputType=InputType.TYPE_CLASS_NUMBER
+                        vh.etSingleInputContent.hint="0-45年"
                     }
                     else->{
                         vh.etSingleInputContent.inputType=InputType.TYPE_CLASS_TEXT
@@ -1087,6 +1100,12 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                     }
                     "车厢长度"->{
                         vh.etInputUnitValue.hint="0-15"
+                    }
+                    "计划工期","施工工期"->{
+                        vh.etInputUnitValue.hint="1-60"
+                    }
+                    "年龄要求"->{
+                        vh.etInputUnitValue.hint="16-60"
                     }
                 }
                 vh.etInputUnitValue.addTextChangedListener(object :TextWatcher{
@@ -1379,10 +1398,11 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
             {
                 val context=vh.itemView.context
                 vh.tvShiftInputTitle.text=mData[position].shiftInputTitle
-                    vh.tvShiftInputContent.text=mData[position].shiftInputContent
+                    vh.tvShiftInputContent.setText(mData[position].shiftInputContent)
                 vh.tvShiftInputShow.setOnClickListener(mData[position].jumpListener)
                 vh.itemView.setOnClickListener(mData[position].jumpListener)
                 vh.viewShiftInputShow.setOnClickListener(mData[position].jumpListener)
+                vh.tvShiftInputContent.setOnClickListener(mData[position].jumpListener)
                 if(mData[position].shiftInputTitle=="可服务地域"){
                     vh.tvShiftInputShow.setOnClickListener{
                         val selectDialog=CustomDialog(CustomDialog.Options.SELECT_CHECK_DIALOG,vh.itemView.context,mData[position].placeCheckArray,mData[position].shiftInputContent,vh.mHandler).dialog
@@ -1392,6 +1412,9 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                         vh.tvShiftInputShow.callOnClick()
                     }
                     vh.viewShiftInputShow.setOnClickListener{
+                        vh.tvShiftInputShow.callOnClick()
+                    }
+                    vh.tvShiftInputContent.setOnClickListener {
                         vh.tvShiftInputShow.callOnClick()
                     }
                 }
@@ -1413,6 +1436,9 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                         vh.ivShiftInputPicture.callOnClick()
                     }
                     vh.viewShiftInputShow.setOnClickListener{
+                        vh.ivShiftInputPicture.callOnClick()
+                    }
+                    vh.tvShiftInputContent.setOnClickListener {
                         vh.ivShiftInputPicture.callOnClick()
                     }
                 }
