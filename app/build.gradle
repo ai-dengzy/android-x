@@ -16,7 +16,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.eletronicengineer"
-        minSdkVersion 22
+        minSdkVersion 28
         targetSdkVersion 28
         versionCode 4
         versionName "2.4"

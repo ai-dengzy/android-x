@@ -228,6 +228,9 @@ class NetworkAdapter {
                     if (data.inputRangeValue2 != "")
                         resultList.add(data.inputRangeValue2)
                 }
+                MultiStyleItem.Options.SELECT_DIALOG->{
+                    resultList=data.selectContent.split(" ") as MutableList<String>
+                }
                 MultiStyleItem.Options.THREE_OPTIONS_SELECT_DIALOG->{
                     resultList=data.selectContent.split(" ") as MutableList<String>
                 }
@@ -882,6 +885,9 @@ class NetworkAdapter {
             MultiStyleItem.Options.SHIFT_INPUT -> {
                 if(data.shiftInputTitle=="车辆照片")
                     result = data.shiftInputPicture
+               else if(data.shiftInputTitle=="租赁时间"){
+                    result=data.shiftInputContent
+                }
                 else
                 for(j in UnSerializeDataBase.imgList){
                     if(j.key==data.key){
@@ -6105,7 +6111,15 @@ class NetworkAdapter {
                                 if(j.shiftInputContent=="")
                                     result = "${j.shiftInputTitle.replace("：", "")}不能为空"
                             }
+                            "租赁时间"->{
+                                if(j.shiftInputContent=="")
+                                    result = "${j.shiftInputTitle.replace("：", "")}没有选择"
+                            }
                         }
+                    }
+                    if (result != "") {
+                        ToastHelper.mToast(context,result)
+                        return false
                     }
                 }
 

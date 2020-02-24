@@ -1408,6 +1408,23 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                         val selectDialog=CustomDialog(CustomDialog.Options.SELECT_CHECK_DIALOG,vh.itemView.context,mData[position].placeCheckArray,mData[position].shiftInputContent,vh.mHandler).dialog
                         selectDialog.show()
                     }
+                    vh.tvShiftInputContent.hint="请选择"
+                    vh.itemView.setOnClickListener{
+                        vh.tvShiftInputShow.callOnClick()
+                    }
+                    vh.viewShiftInputShow.setOnClickListener{
+                        vh.tvShiftInputShow.callOnClick()
+                    }
+                    vh.tvShiftInputContent.setOnClickListener {
+                        vh.tvShiftInputShow.callOnClick()
+                    }
+                }
+                if(mData[position].shiftInputTitle=="租赁时间"){
+                    vh.tvShiftInputShow.setOnClickListener{
+                        val selectDialog=CustomDialog(CustomDialog.Options.SELECT_DATE_DIALOG,vh.itemView.context,mData[position].shiftInputTitle,mData[position].shiftInputContent,vh.mHandler).dialog
+                        selectDialog.show()
+                    }
+                    vh.tvShiftInputContent.hint="请选择"
                     vh.itemView.setOnClickListener{
                         vh.tvShiftInputShow.callOnClick()
                     }
@@ -1454,8 +1471,14 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                     vh.etDialogSelectItem.setText(mData[position].selectContent)
                 }
                 vh.tvDialogSelectShow.setOnClickListener{
-                    val selectDialog=CustomDialog(CustomDialog.Options.SELECT_DIALOG,vh.itemView.context,mData[position].selectOption1Items,vh.mHandler).dialog
-                    selectDialog.show()
+                    if(mData[position].selectTitle=="资质类别及等级"&&mData[position].selectOption1Items[0]=="工程设计电力行业送电工程"){
+                        val selectDialog=CustomDialog(CustomDialog.Options.SELECT_LONG_DIALOG,vh.itemView.context,mData[position].selectTitle,mData[position].selectOption1Items,vh.mHandler).dialog
+                        selectDialog.show()
+                    }else{
+                        val selectDialog=CustomDialog(CustomDialog.Options.SELECT_DIALOG,vh.itemView.context,mData[position].selectOption1Items,vh.mHandler).dialog
+                        selectDialog.show()
+                    }
+
                 }
                 vh.itemView.setOnClickListener {
                     vh.tvDialogSelectShow.callOnClick()
@@ -1701,7 +1724,8 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                     sp.setSpan(ForegroundColorSpan(Color.parseColor("#a6a6a6")),startPosition,endPosition,Spanned.SPAN_INCLUSIVE_INCLUSIVE)
                 }
                 vh.tvsingleDisplayRightTitle.text=sp
-                val spannable = SpannableStringBuilder(mData[position].singleDisplayRightContent)
+                val spannable = SpannableStringBuilder(if(mData[position].singleDisplayRightContent.length>=13) {"查看详情"}
+                        else{mData[position].singleDisplayRightContent})
                 when(mData[position].singleDisplayRightContent.replace(" ","")) {
                     "查看", "上传", "点击查看","录入" -> {
                         spannable.setSpan(
@@ -1717,6 +1741,28 @@ class RecyclerviewAdapter: RecyclerView.Adapter<RecyclerviewAdapter.VH> {
                             Spanned.SPAN_INCLUSIVE_INCLUSIVE
                         )
                     }
+                }
+                if(mData[position].singleDisplayRightContent.length>=13){
+                    spannable.setSpan(
+                        BackgroundColorSpan(Color.parseColor("#248aff")),
+                        0,
+                        4,
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                    )
+                    spannable.setSpan(
+                        ForegroundColorSpan(Color.WHITE),
+                        0,
+                       4,
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                    )
+                        vh.tvsingleDisplayRightContent.setOnClickListener{
+                            val selectDialog=CustomDialog(CustomDialog.Options.SELECT_PROMPT_DIALOG,vh.itemView.context,mData[position].singleDisplayRightTitle,mData[position].singleDisplayRightContent,vh.mHandler).dialog
+                            selectDialog.show()
+                        }
+                        vh.itemView.setOnClickListener{
+                            vh.tvsingleDisplayRightContent.callOnClick()
+                        }
+
                 }
                 vh.tvsingleDisplayRightContent.setText(spannable)
                 if(mData[position].jumpListener!=null){

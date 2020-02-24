@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="@dimen/top_1"
+    android:layout_marginTop="@dimen/top_5"
     android:id="@+id/yellow_pages_release"
     android:layout_below="@+id/advertisement_iv"
     android:layout_width="match_parent"
@@ -12,9 +12,9 @@
     <EditText
         android:id="@+id/et_yellow_pages_name"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/general_45"
+        android:layout_height="@dimen/general_35"
         android:hint="请输入企业名称"
-        android:paddingBottom="@dimen/bottom_10"
+        android:paddingBottom="@dimen/bottom_5"
         android:paddingTop="@dimen/top_10"
         android:paddingStart="@dimen/general_20"
         android:paddingEnd="@dimen/general_20"

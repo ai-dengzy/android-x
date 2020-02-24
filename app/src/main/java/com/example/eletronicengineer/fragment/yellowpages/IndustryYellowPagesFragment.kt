@@ -133,20 +133,20 @@ class IndustryYellowPagesFragment: Fragment(){
                     initYellowPagesGrade1(mView,Option1Items,Option2Items,Option3Items, d_temp)
                 }
                 "勘察设计类"->{
-                    val Option1Items= listOf("工程设计电力行业送电工程专业甲级","工程设计电力行业送电工程专业乙级","工程设计电力行业送电工程专业丙级","") as MutableList<String>
-                    val Option2Items= listOf(listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
-                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
-                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
-                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""))as MutableList<MutableList<String>>
-                    val Option3Items=listOf(listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
-                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
-                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
-                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
-                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
-                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
-                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
-                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""))) as MutableList<MutableList<MutableList<String>>>
-                    initYellowPagesGrade1(mView,Option1Items,Option2Items,Option3Items,d_temp)
+                    val Option1Items= listOf("工程设计电力行业送电工程","工程设计电力行业变电工程","工程勘察工程测量","专业甲级","专业乙级","专业丙级","不选择") as MutableList<String>
+//                    val Option2Items= listOf(listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
+//                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
+//                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""),
+//                        listOf("工程设计电力行业变电工程专业甲级","工程设计电力行业变电工程专业乙级","工程设计电力行业变电工程专业丙级",""))as MutableList<MutableList<String>>
+//                    val Option3Items=listOf(listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
+//                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
+//                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
+//                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
+//                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
+//                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级","")),
+//                        listOf(listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),
+//                            listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""),listOf("工程勘察工程测量专业甲级","工程勘察工程测量专业乙级","工程勘察工程测量专业丙级",""))) as MutableList<MutableList<MutableList<String>>>
+                    initYellowPagesGrade2(mView,Option1Items,d_temp)
                 }
                 "监理类"->{
                     val Option1Items= listOf("工程监理电力工程专业甲级","工程监理电力工程专业乙级","工程监理电力工程专业丙级") as MutableList<String>
@@ -454,8 +454,14 @@ class IndustryYellowPagesFragment: Fragment(){
                 }
             }
         })
-        val selectDialog= CustomDialog(CustomDialog.Options.SELECT_DIALOG,view.context,Option1Items,mHandler).dialog
-        selectDialog.show()
+        if(Option1Items[0]=="工程设计电力行业送电工程"){
+            val selectDialog=CustomDialog(CustomDialog.Options.SELECT_LONG_DIALOG,view.context,"资质类别及等级",Option1Items,mHandler).dialog
+            selectDialog.show()
+        }else{
+            val selectDialog= CustomDialog(CustomDialog.Options.SELECT_DIALOG,view.context,Option1Items,mHandler).dialog
+            selectDialog.show()
+        }
+
     }
     //类别弹窗
     fun initYellowPagesType(view:View,Option1Items: MutableList<String>){

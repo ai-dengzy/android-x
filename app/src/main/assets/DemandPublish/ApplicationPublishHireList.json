@@ -29,8 +29,9 @@
     "singleDisplayRightContent":""
   },
   {
-    "type":"SINGLE_INPUT",
-    "inputSingleTitle":"租赁时间",
+    "type":"SHIFT_INPUT",
+    "shiftInputTitle":"租赁时间",
+    "necessary":false,
     "key":"hireTime",
     "sendFormat":"String"
   },

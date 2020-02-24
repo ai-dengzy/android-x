@@ -126,6 +126,9 @@ class PublishInventoryItemMoreFragment:Fragment() {
                     MultiStyleItem.Options.SINGLE_DISPLAY_RIGHT -> {
                         data[position].singleDisplayRightContent = j.singleDisplayRightContent
                     }
+                    MultiStyleItem.Options.SHIFT_INPUT->{
+                        data[position].shiftInputContent=j.shiftInputContent
+                    }
                 }
             }
             return data
